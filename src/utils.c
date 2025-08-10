@@ -1215,3 +1215,319 @@ bool IsContainsValue(struct Vector *vec, double value)
   }
   return false;
 }
+
+/* Function for the Min Max Normalization */
+struct Vector *MinMaxNorm(struct Vector *vec)
+{
+  if(!vec || vec->dimension == 0) return NULL;
+
+  struct Vector *newVector = vector(NULL, vec->dimension, TYPE_DOUBLE);
+
+  if(!newVector) return NULL;
+
+  double max_value = Max(vec);
+  double min_value = Min(vec);
+
+  if(max_value == min_value) return NULL;
+
+  switch(vec->type)
+  {
+    case TYPE_INT8:{
+                    int8_t *arr = vec->data;
+                    double *out = newVector->data;
+                    for(size_t i = 0; i < vec->dimension; i++)
+                    {
+                      out[i] = (arr[i] - min_value) / (max_value - min_value);
+                    }
+                    break;
+                  }
+                  
+    case TYPE_INT16:{
+                    int16_t *arr = vec->data;
+                    double *out = newVector->data;
+                    for(size_t i = 0; i < vec->dimension; i++)
+                    {
+                      out[i] = (arr[i] - min_value) / (max_value - min_value);
+                    }
+                    break;
+                  }
+
+    case TYPE_INT32:{
+                    int32_t *arr = vec->data;
+                    double *out = newVector->data;
+                    for(size_t i = 0; i < vec->dimension; i++)
+                    {
+                      out[i] = (arr[i] - min_value) / (max_value - min_value);
+                    }
+                    break;
+                  }
+
+    case TYPE_INT64:{
+                    int64_t *arr = vec->data;
+                    double *out = newVector->data;
+                    for(size_t i = 0; i < vec->dimension; i++)
+                    {
+                      out[i] = (arr[i] - min_value) / (max_value - min_value);
+                    }
+                    break;
+                  }
+
+    case TYPE_UINT8:{
+                    uint8_t *arr = vec->data;
+                    double *out = newVector->data;
+                    for(size_t i = 0; i < vec->dimension; i++)
+                    {
+                      out[i] = (arr[i] - min_value) / (max_value - min_value);
+                    }
+                    break;
+                  }
+
+    case TYPE_UINT16:{
+                    uint16_t *arr = vec->data;
+                    double *out = newVector->data;
+                    for(size_t i = 0; i < vec->dimension; i++)
+                    {
+                      out[i] = (arr[i] - min_value) / (max_value - min_value);
+                    }
+                    break;
+                  }
+
+    case TYPE_UINT32:{
+                    uint32_t *arr = vec->data;
+                    double *out = newVector->data;
+                    for(size_t i = 0; i < vec->dimension; i++)
+                    {
+                      out[i] = (arr[i] - min_value) / (max_value - min_value);
+                    }
+                    break;
+                  }
+
+    case TYPE_UINT64:{
+                    uint64_t *arr = vec->data;
+                    double *out = newVector->data;
+                    for(size_t i = 0; i < vec->dimension; i++)
+                    {
+                      out[i] = (arr[i] - min_value) / (max_value - min_value);
+                    }
+                    break;
+                  }
+
+    case TYPE_FLOAT:{
+                    float *arr = vec->data;
+                    double *out = newVector->data;
+                    for(size_t i = 0; i < vec->dimension; i++)
+                    {
+                      out[i] = (arr[i] - min_value) / (max_value - min_value);
+                    }
+                    break;
+                  }
+
+    case TYPE_DOUBLE:{
+                    double *arr = vec->data;
+                    double *out = newVector->data;
+                    for(size_t i = 0; i < vec->dimension; i++)
+                    {
+                      out[i] = (arr[i] - min_value) / (max_value - min_value);
+                    }
+                    break;
+                  }
+    default:
+            return NULL;
+  }
+  return newVector;
+}
+
+/* Function for the z score normalization */
+
+struct Vector *ZScoreNorm(struct Vector *vec)
+{
+    if (!vec || vec->dimension == 0) return NULL;
+
+    struct Vector *newVector = vector(NULL, vec->dimension, TYPE_DOUBLE);
+    if (!newVector) return NULL;
+
+    double mean_value = Mean(vec);
+    double std_dev = StandardDeviation(vec);
+    if (std_dev == 0) return NULL;  // Avoid division by zero
+
+    #define ZSCORE_CASE(type) \
+        { \
+            type *arr = vec->data; \
+            double *out = newVector->data; \
+            for (size_t i = 0; i < vec->dimension; i++) \
+                out[i] = ((double)arr[i] - mean_value) / std_dev; \
+            break; \
+        }
+
+    switch (vec->type)
+    {
+        case TYPE_INT8:   ZSCORE_CASE(int8_t);
+        case TYPE_INT16:  ZSCORE_CASE(int16_t);
+        case TYPE_INT32:  ZSCORE_CASE(int32_t);
+        case TYPE_INT64:  ZSCORE_CASE(int64_t);
+        case TYPE_UINT8:  ZSCORE_CASE(uint8_t);
+        case TYPE_UINT16: ZSCORE_CASE(uint16_t);
+        case TYPE_UINT32: ZSCORE_CASE(uint32_t);
+        case TYPE_UINT64: ZSCORE_CASE(uint64_t);
+        case TYPE_FLOAT:  ZSCORE_CASE(float);
+        case TYPE_DOUBLE: ZSCORE_CASE(double);
+        default: 
+            return NULL;
+    }
+
+    #undef ZSCORE_CASE
+    return newVector;
+}
+
+/* Function for the max absoute normalization */
+
+struct Vector *MaxAbsoluteNorm(struct Vector *vec)
+{
+    if (!vec || vec->dimension == 0) return NULL;
+
+    struct Vector *newVector = vector(NULL, vec->dimension, TYPE_DOUBLE);
+    if (!newVector) return NULL;
+
+    // Find max absolute value
+    double max_abs = 0.0;
+
+    #define FIND_MAXABS(type) \
+        { \
+            type *arr = vec->data; \
+            for (size_t i = 0; i < vec->dimension; i++) { \
+                double val = fabs((double)arr[i]); \
+                if (val > max_abs) max_abs = val; \
+            } \
+            break; \
+        }
+
+    switch (vec->type)
+    {
+        case TYPE_INT8:   FIND_MAXABS(int8_t);
+        case TYPE_INT16:  FIND_MAXABS(int16_t);
+        case TYPE_INT32:  FIND_MAXABS(int32_t);
+        case TYPE_INT64:  FIND_MAXABS(int64_t);
+        case TYPE_UINT8:  FIND_MAXABS(uint8_t);
+        case TYPE_UINT16: FIND_MAXABS(uint16_t);
+        case TYPE_UINT32: FIND_MAXABS(uint32_t);
+        case TYPE_UINT64: FIND_MAXABS(uint64_t);
+        case TYPE_FLOAT:  FIND_MAXABS(float);
+        case TYPE_DOUBLE: FIND_MAXABS(double);
+        default: return NULL;
+    }
+
+    #undef FIND_MAXABS
+
+    if (max_abs == 0) return NULL;  // Prevent division by zero
+
+    // Normalize by max absolute value
+    #define NORMALIZE(type) \
+        { \
+            type *arr = vec->data; \
+            double *out = newVector->data; \
+            for (size_t i = 0; i < vec->dimension; i++) { \
+                out[i] = (double)arr[i] / max_abs; \
+            } \
+            break; \
+        }
+
+    switch (vec->type)
+    {
+        case TYPE_INT8:   NORMALIZE(int8_t);
+        case TYPE_INT16:  NORMALIZE(int16_t);
+        case TYPE_INT32:  NORMALIZE(int32_t);
+        case TYPE_INT64:  NORMALIZE(int64_t);
+        case TYPE_UINT8:  NORMALIZE(uint8_t);
+        case TYPE_UINT16: NORMALIZE(uint16_t);
+        case TYPE_UINT32: NORMALIZE(uint32_t);
+        case TYPE_UINT64: NORMALIZE(uint64_t);
+        case TYPE_FLOAT:  NORMALIZE(float);
+        case TYPE_DOUBLE: NORMALIZE(double);
+        default: return NULL;
+    }
+
+    #undef NORMALIZE
+
+    return newVector;
+}
+
+
+/* Function for the decimal scaling Normalization */
+
+struct Vector *DecimalScalingNorm(struct Vector *vec)
+{
+    if (!vec || vec->dimension == 0) return NULL;
+
+    struct Vector *newVector = vector(NULL, vec->dimension, TYPE_DOUBLE);
+    if (!newVector) return NULL;
+
+    // Find max absolute value
+    double max_abs = 0.0;
+
+    #define FIND_MAXABS(type) \
+        { \
+            type *arr = vec->data; \
+            for (size_t i = 0; i < vec->dimension; i++) { \
+                double val = fabs((double)arr[i]); \
+                if (val > max_abs) max_abs = val; \
+            } \
+            break; \
+        }
+
+    switch (vec->type)
+    {
+        case TYPE_INT8:   FIND_MAXABS(int8_t);
+        case TYPE_INT16:  FIND_MAXABS(int16_t);
+        case TYPE_INT32:  FIND_MAXABS(int32_t);
+        case TYPE_INT64:  FIND_MAXABS(int64_t);
+        case TYPE_UINT8:  FIND_MAXABS(uint8_t);
+        case TYPE_UINT16: FIND_MAXABS(uint16_t);
+        case TYPE_UINT32: FIND_MAXABS(uint32_t);
+        case TYPE_UINT64: FIND_MAXABS(uint64_t);
+        case TYPE_FLOAT:  FIND_MAXABS(float);
+        case TYPE_DOUBLE: FIND_MAXABS(double);
+        default: return NULL;
+    }
+
+    #undef FIND_MAXABS
+
+    if (max_abs == 0) return NULL; // Avoid division by zero if all zero
+
+    // Calculate j = number of decimal places to scale by
+    int j = (int)ceil(log10(max_abs));
+
+    // Normalize by dividing each element by 10^j
+    double divisor = pow(10.0, j);
+
+    #define NORMALIZE(type) \
+        { \
+            type *arr = vec->data; \
+            double *out = newVector->data; \
+            for (size_t i = 0; i < vec->dimension; i++) { \
+                out[i] = (double)arr[i] / divisor; \
+            } \
+            break; \
+        }
+
+    switch (vec->type)
+    {
+        case TYPE_INT8:   NORMALIZE(int8_t);
+        case TYPE_INT16:  NORMALIZE(int16_t);
+        case TYPE_INT32:  NORMALIZE(int32_t);
+        case TYPE_INT64:  NORMALIZE(int64_t);
+        case TYPE_UINT8:  NORMALIZE(uint8_t);
+        case TYPE_UINT16: NORMALIZE(uint16_t);
+        case TYPE_UINT32: NORMALIZE(uint32_t);
+        case TYPE_UINT64: NORMALIZE(uint64_t);
+        case TYPE_FLOAT:  NORMALIZE(float);
+        case TYPE_DOUBLE: NORMALIZE(double);
+        default: return NULL;
+    }
+
+    #undef NORMALIZE
+
+    return newVector;
+}
+
+
+
