@@ -1140,3 +1140,78 @@ double Variance(struct Vector *vec)
     double std_val = StandardDeviation(vec);
     return std_val * std_val;
 }
+
+/* Function to find the index of maximum value of the vector */
+
+int IndexOfMax(struct Vector *vec)
+{
+  if(!vec || vec->dimension == 0) return 0;
+
+  double max_value = (double)vec->data[0];
+  size_t max_index = 0;
+  double *arr = (double *)vec->data;
+
+  for(size_t i = 1; i < vec->dimension; i++)
+  {
+    if(arr[i] > max_value)
+    {
+      max_value = (double)vec->data[i];
+      max_index = i;
+    }
+  }
+  return (int)max_index;
+}
+
+/* Function to find the index of the minimum value of the vector*/
+
+int IndexOfMin(struct Vector *vec)
+{
+  if(!vec || vec->dimension == 0) return 0;
+
+  double min_value = (double)vec->data[0];
+  size_t min_index = 0;
+  double *arr = (double *)vec->data;
+
+  for(size_t i = 1; i < vec->dimension; i++)
+  {
+    if(arr[i] < min_value)
+    {
+      min_value = (double)vec->data[i];
+      min_index = i;
+    }
+  }
+  return (int)min_index;
+}
+
+/* Function to find the index of a value in the vector */
+
+int IndexOfValue(struct Vector *vec, double value)
+{
+  if(!vec || vec->dimension == 0) return 0;
+
+  double *arr = (double *)vec->data;
+
+  for(size_t i = 0; i < vec->dimension; i++)
+  {
+    if(arr[i] == value) return (int)i;
+  }
+  return -1;
+}
+
+/* Function to check whether a value is present or not in the vector */
+
+bool IsContainsValue(struct Vector *vec, double value)
+{
+  if(!vec || vec->dimension == 0) return false;
+
+  double *arr = (double *)vec->data;
+
+  for(size_t i = 0; i < vec->dimension; i++)
+  {
+    if (arr[i] == value)
+    {
+      return true;
+    }
+  }
+  return false;
+}
